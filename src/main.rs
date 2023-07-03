@@ -17,6 +17,8 @@ async fn main() -> std::io::Result<()> {
         None => exit(1),
     };
 
+    log::info!("loaded config: {:?}", config);
+
     let sock = SocketAddr::from_str(&config.bind)
         .expect(format!("invalid bind address `{}`", &config.bind).as_str());
 
@@ -47,6 +49,7 @@ async fn main() -> std::io::Result<()> {
 /// variable. If the environment variable is not set, defaults to "config.toml"
 fn read_config() -> Option<config_file::ConfigFile> {
     let config_file_path = env::var("SERVEBOX_CONFIG_FILE").unwrap_or(String::from("config.toml"));
+    log::info!("loading config file from `{}`", config_file_path);
     config_file::load_config_file(config_file_path)
 }
 
