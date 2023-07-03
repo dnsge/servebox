@@ -20,6 +20,12 @@ async fn main() -> std::io::Result<()> {
     let sock = SocketAddr::from_str(&config.bind)
         .expect(format!("invalid bind address `{}`", &config.bind).as_str());
 
+    let num_routes = config.serve.len();
+    if num_routes == 0 {
+        eprintln!("no serve routes specified in config file");
+        exit(1);
+    }
+
     let mut server = HttpServer::new(move || {
         let mut a = App::new();
         for route in &config.serve {
@@ -33,6 +39,7 @@ async fn main() -> std::io::Result<()> {
     }
 
     log::info!("starting HTTP server at http://{}", sock);
+    log::info!("serving for {} routes", num_routes);
     server.bind(sock)?.run().await
 }
 
@@ -45,21 +52,16 @@ fn read_config() -> Option<config_file::ConfigFile> {
 
 /// Creates a Files service handler from a ServePath
 fn make_files_route(route: &ServePath) -> Files {
-    log::info!("[Route {} -> {}]", &route.web_path, &route.file_path);
-
     let mut service = Files::new(&route.web_path, &route.file_path);
     if let Some(index_path) = &route.index_file {
-        log::info!("  index = {}", index_path);
         service = service.index_file(index_path);
     }
     if let Some(show) = route.show_index {
         if show {
-            log::info!("  show index = true");
             service = service.show_files_listing();
         }
     }
     if let Some(host) = &route.host {
-        log::info!("  host = {}", host);
         service = service.guard(host_guard::new(host))
     }
     service

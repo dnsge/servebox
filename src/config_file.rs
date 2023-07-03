@@ -15,6 +15,8 @@ pub struct ServePath {
 pub struct ConfigFile {
     pub bind: String,
     pub workers: Option<usize>,
+
+    #[serde(default)]
     pub serve: Vec<ServePath>,
 }
 
