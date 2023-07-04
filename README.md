@@ -34,5 +34,5 @@ $ docker run \
     -v ./config:/config:ro \
     -v ./files:/files:ro \
     -p 8080:8080 \
-    ghcr.io/dnsge/servebox:master
+    ghcr.io/dnsge/servebox:latest
 ```
